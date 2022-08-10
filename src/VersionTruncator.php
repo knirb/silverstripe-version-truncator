@@ -82,7 +82,7 @@ class VersionTruncator extends DataExtension
                 );
             }
             $query->setOrderBy('LastEdited DESC, ID DESC');
-            $limit = Config::inst()->get('VersionTruncator', 'delete_limit');
+            $limit = Config::inst()->get(VersionTruncator::class, 'delete_limit');
             if (!$limit) {
                 $limit = 100;
             }
@@ -172,7 +172,7 @@ class VersionTruncator extends DataExtension
                 'WasPublished = 0'
             );
             $query->setOrderBy('LastEdited DESC, ID DESC');
-            $limit = Config::inst()->get('VersionTruncator', 'delete_limit');
+            $limit = Config::inst()->get(VersionTruncator::class, 'delete_limit');
             if (!$limit) {
                 $limit = 100;
             }
