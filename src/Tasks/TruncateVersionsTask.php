@@ -1,4 +1,5 @@
 <?php
+
 namespace Axllent\VersionTruncator\Tasks;
 
 use Axllent\VersionTruncator\VersionTruncator;
@@ -108,7 +109,7 @@ class TruncateVersionsTask extends BuildTask
      *
      * @return void
      */
-    private function _prune()
+    protected function _prune()
     {
         $classes = $this->_getAllVersionedDataClasses();
 
@@ -122,6 +123,9 @@ class TruncateVersionsTask extends BuildTask
 
             foreach ($records as $r) {
                 // check if stages are present
+                if (!($r->hasMethod('hasStages') && $r->hasMethod('isLiveVersion'))) {
+                    continue;
+                }
                 if (!$r->hasStages()) {
                     continue;
                 }
@@ -148,7 +152,7 @@ class TruncateVersionsTask extends BuildTask
      *
      * @return HTTPResponse
      */
-    private function _pruneDeletedFileVersions()
+    protected function _pruneDeletedFileVersions()
     {
         DB::alteration_message('Pruning all deleted File DataObjects');
 
@@ -192,7 +196,7 @@ class TruncateVersionsTask extends BuildTask
      *
      * @return HTTPResponse
      */
-    private function _reset()
+    protected function _reset()
     {
         DB::alteration_message('Pruning all published records');
 
@@ -210,7 +214,7 @@ class TruncateVersionsTask extends BuildTask
             $class::config()->set('keep_redirects', false);
 
             foreach ($records as $r) {
-                if ($r->isLiveVersion()) {
+                if ($r->hasMethod('isLiveVersion') && $r->isLiveVersion()) {
                     $deleted += $r->doVersionCleanup();
                 }
             }
@@ -233,7 +237,7 @@ class TruncateVersionsTask extends BuildTask
      *
      * @return array
      */
-    private function _getAllVersionedDataClasses()
+    protected function _getAllVersionedDataClasses()
     {
         $all_classes       = ClassInfo::subclassesFor(DataObject::class);
         $versioned_classes = [];
