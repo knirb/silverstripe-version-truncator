@@ -1,4 +1,5 @@
 <?php
+
 namespace Axllent\VersionTruncator;
 
 use SilverStripe\Core\Config\Config;
@@ -81,7 +82,11 @@ class VersionTruncator extends DataExtension
                 );
             }
             $query->setOrderBy('LastEdited DESC, ID DESC');
-            $query->setLimit(100, $keep_versions);
+            $limit = Config::inst()->get('VersionTruncator', 'delete_limit');
+            if (!$limit) {
+                $limit = 100;
+            }
+            $query->setLimit($limit, $keep_versions);
 
             $results = $query->execute();
 
@@ -89,7 +94,8 @@ class VersionTruncator extends DataExtension
                 array_push($to_delete, $result['Version']);
             }
 
-            if ($baseTable == 'SiteTree'
+            if (
+                $baseTable == 'SiteTree'
                 && $this->_config('keep_redirects')
             ) {
                 // Get the most recent Version IDs of all published pages to ensure
@@ -166,7 +172,11 @@ class VersionTruncator extends DataExtension
                 'WasPublished = 0'
             );
             $query->setOrderBy('LastEdited DESC, ID DESC');
-            $query->setLimit(100, $this->_config('keep_drafts'));
+            $limit = Config::inst()->get('VersionTruncator', 'delete_limit');
+            if (!$limit) {
+                $limit = 100;
+            }
+            $query->setLimit($limit, $this->_config('keep_drafts'));
 
             $results = $query->execute();
 
